@@ -1,0 +1,68 @@
+# Load necessary libraries
+library(readr)
+library(ggplot2)
+library(dplyr)
+
+# Read the data
+banana_data <- read_csv("banana.csv")
+
+# 1. Understanding and Analyzing Numerical Characteristics
+
+## a) Summary Statistics
+print(summary(banana_data))
+
+## b) QQ Plots for Normality Check
+par(mfrow = c(2, 3))  # Adjust grid layout based on the number of variables
+variables <- c("Size", "Weight", "Sweetness", "Softness", "Ripeness", "Acidity")
+for (var in variables) {
+  qqnorm(banana_data[[var]], main = paste("QQ Plot of", var))
+  qqline(banana_data[[var]])
+}
+par(mfrow = c(1, 1))  # Reset layout
+
+## c) Pairwise Scatterplots
+pairs(~ Size + Weight + Sweetness + Softness + Ripeness + Acidity, data = banana_data)
+
+## d) Histograms of Harvest Time by Quality
+ggplot(banana_data, aes(x = HarvestTime, fill = Quality)) +
+  geom_histogram(binwidth = 1, position = "dodge") +
+  facet_wrap(~Quality)
+
+# 2. Association Between Characteristics and Quality
+
+## a) Side-by-Side Boxplots
+for (var in variables) {
+  ggplot(banana_data, aes_string(x = "Quality", y = var, fill = "Quality")) +
+    geom_boxplot() +
+    ggtitle(paste("Boxplot of", var, "by Quality")) +
+    theme_minimal() +
+    theme(plot.title = element_text(hjust = 0.5)) +
+    ylab(var) +
+    xlab("Quality") +
+    scale_fill_discrete(name = "Quality") +
+    print()
+}
+
+## b) Summary Statistics for Comparison
+for (var in variables) {
+  cat("\nSummary of", var, "for Good Quality Bananas:\n")
+  print(summary(subset(banana_data, Quality == "Good")[[var]]))
+  cat("\nSummary of", var, "for Bad Quality Bananas:\n")
+  print(summary(subset(banana_data, Quality == "Bad")[[var]]))
+}
+
+# 3. Further Investigation (Example: Analysis based on Size)
+
+## Calculate the mean size
+mean_size <- mean(banana_data$Size)
+
+## Analyze attributes for bananas with sizes above and below the mean size
+above_mean <- subset(banana_data, Size > mean_size)
+below_mean <- subset(banana_data, Size <= mean_size)
+
+cat("\nAnalysis of Weight for Bananas with Size above the Mean:\n")
+print(summary(above_mean$Weight))
+
+cat("\nAnalysis of Weight for Bananas with Size below the Mean:\n")
+print(summary(below_mean$Weight))
+

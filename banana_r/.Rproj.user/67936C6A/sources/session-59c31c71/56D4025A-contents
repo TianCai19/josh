@@ -1,0 +1,32 @@
+---
+title: "MATH1041 Assignment 1 Analysis"
+author: "Your Name"
+date: "2024-03-26"
+output: html_document
+---
+
+## Introduction
+
+This report presents a statistical analysis of banana data. The goal is to explore the relationships between various characteristics of bananas and their quality.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+library(readr)
+library(ggplot2)
+library(dplyr)
+```
+
+
+```{r}
+# Load the banana data
+banana_data <- read_csv("banana.csv")
+
+```
+Exploratory Data Analysis (EDA)
+Summary Statistics
+Let's begin with some summary statistics for each variable.
+```{r}
+summary(banana_data)
+
+```
+

@@ -1,0 +1,113 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+
+
+## Introduction
+
+This report presents a statistical analysis of banana data. The goal is to explore the relationships between various characteristics of bananas and their quality.
+
+```{r setup, include=FALSE}
+library(readr)
+library(ggplot2)
+library(dplyr)
+```
+
+## Data Loading
+
+
+
+```{r }
+# Load the banana data
+banana_data <- read_csv("banana.csv")
+head(banana_data)
+```
+
+## Exploratory Data Analysis (EDA)
+
+### Summary Statistics
+
+Let's begin with some summary statistics for each variable.
+
+```{r summary-stats}
+summary(banana_data)
+```
+
+### Visualizing Distributions with Histograms
+
+Histograms provide a quick way to visualize the distribution of each numerical variable.
+
+```{r histogram-plots, fig.width=10, fig.height=8}
+# Plotting histograms for each numerical variable
+num_vars <- c("Size", "Weight", "Sweetness", "Softness", "Ripeness", "Acidity", "HarvestTime")
+for (var in num_vars) {
+  print(ggplot(banana_data, aes_string(x = var)) + 
+          geom_histogram(bins = 30, fill = "skyblue", color = "black") + 
+          theme_minimal() + 
+          ggtitle(paste("Histogram of", var)))
+}
+```
+
+### QQ Plots for Assessing Normality
+
+QQ plots help in assessing if the variables follow a normal distribution.
+
+```{r qq-plots}
+# Generating QQ plots
+par(mfrow = c(2, 3))
+for (var in num_vars[-7]) { # Excluding 'HarvestTime'
+  qqnorm(banana_data[[var]], main = paste("QQ Plot of", var))
+  qqline(banana_data[[var]])
+}
+par(mfrow = c(1, 1))
+```
+
+### Pairwise Scatterplots
+
+Investigate the relationships between variables with pairwise scatterplots.
+
+```{r scatterplot-matrix}
+pairs(~ Size + Weight + Sweetness + Softness + Ripeness + Acidity, data = banana_data)
+```
+
+### Boxplots by Quality
+
+Boxplots are excellent for comparing distributions between two or more groups.
+
+```{r boxplots-quality, fig.width=10, fig.height=8}
+for (var in num_vars[-7]) { # Excluding 'HarvestTime'
+  print(ggplot(banana_data, aes(x = Quality, y = banana_data[[var]], fill = Quality)) +
+          geom_boxplot() +
+          theme_minimal() +
+          ggtitle(paste("Boxplot of", var, "by Quality")))
+}
+```
+
+## Further Analysis
+
+Based on the initial EDA, you might want to explore specific hypotheses or relationships further. For instance, comparing the characteristics of bananas with 'HarvestTime' above and below the median.
+
+```{r further-analysis}
+# Example: Comparing 'Size' based on 'HarvestTime' median split
+median_harvest_time <- median(banana_data$HarvestTime)
+banana_data$HarvestTimeGroup <- ifelse(banana_data$HarvestTime > median_harvest_time, "Above Median", "Below Median")
+
+ggplot(banana_data, aes(x = HarvestTimeGroup, y = Size, fill = HarvestTimeGroup)) +
+  geom_boxplot() +
+  theme_minimal() +
+  ggtitle("Boxplot of Size by HarvestTime Groups")
+```
+
+## Conclusion
+
+In this report, we conducted a preliminary exploration of the banana dataset, focusing on the relationships between various characteristics and banana quality. Further analyses are recommended to explore identified trends and hypotheses.
+
+```
+
+### Notes for Running the Rmd Document:
+
+- Make sure to install the necessary packages (`readr`, `ggplot2`, `dplyr`) using `install.packages()` if you haven't already.
+- Adjust the file path to `"banana.csv"` as needed based on where your data file is located.
+- This Rmd document is structured to render as an HTML document, which is versatile and easy to share. You can change the output to PDF or Word by modifying the `output:`
